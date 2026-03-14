@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @*<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.1.55/material.css" />*@
+    <link id="syncfusion-theme" href="https://cdn.syncfusion.com/ej2/20.1.55/bootstrap5-dark.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Expense_Tracker.styles.css" asp-append-version="true" />
+    <script src="https://cdn.syncfusion.com/ej2/20.1.55/dist/ej2.min.js"></script>
+    <style>
+        #search-container {
+            display: flex;
+            align-items: center;
+        }
+
+        #search-box {
+            width: 0;
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+
+            #search-box.show {
+                width: 1000px;
+                padding: 0.375rem 0.75rem;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+            }
+    </style>
+    <script>
+        (function () {
+            const darkThemeUrl = "https://cdn.syncfusion.com/ej2/20.1.55/bootstrap5-dark.css";
+            const lightThemeUrl = "https://cdn.syncfusion.com/ej2/20.1.55/bootstrap5.css";
+
+            let savedTheme = "dark";
+            try {
+                const preferredTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+                savedTheme = localStorage.getItem("theme") || preferredTheme;
+            } catch (error) {
+                savedTheme = "dark";
+            }
+
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            const themeStylesheet = document.getElementById("syncfusion-theme");
+            if (themeStylesheet) {
+                themeStylesheet.setAttribute("href", savedTheme === "dark" ? darkThemeUrl : lightThemeUrl);
+            }
+        })();
+    </script>
+</head>
+<body class="e-bigger">
+    @{
+        var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+    }
+
+    @if (isAuthenticated)
+    {
+        <partial name="_SideBar" />
+    }
+
+    <div class="dock-target">
+
+        @if (isAuthenticated)
+        {
+            <nav class="navbar sticky-top">
+                <div class="container-fluid py-2 px-4">
+                    <div id="search-container">
+                        <i class="fa-solid fa-magnifying-glass" id="search-icon"></i>
+                        <input type="text" id="search-box" class="form-control ms-2" placeholder="Search..." />
+                    </div>
+                    <div class="d-flex align-items-center ms-auto">
+                        <button id="theme-toggle" type="button" class="btn btn-outline-secondary btn-sm me-3" title="Toggle theme" aria-label="Toggle theme">
+                            <i id="theme-toggle-icon" class="fa-solid fa-circle-half-stroke"></i>
+                            <span id="theme-toggle-text" class="ms-1">Theme</span>
+                        </button>
+                        <div class="dropdown">
+                            <i class="fa-solid fa-bell"></i>
+                            <i class="fa-solid fa-message"></i>
+                            <img class="profile-pic dropdown-toggle" src="~/profileImage.jpg" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" />
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><span class="dropdown-item-text">@User?.Identity?.Name</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        }
+        else
+        {
+            <button id="theme-toggle" type="button" class="btn btn-outline-secondary btn-sm theme-toggle-floating" title="Toggle theme" aria-label="Toggle theme">
+                <i id="theme-toggle-icon" class="fa-solid fa-circle-half-stroke"></i>
+                <span id="theme-toggle-text" class="ms-1">Theme</span>
+            </button>
+        }
+
+        <div class="main-content">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="@(isAuthenticated ? (ViewData["isDashboard"] == null ? "col-md-10" : "col-md-12") : "col-md-12")">
+                        <main role="main" class="pb-3">
+                            @if (isAuthenticated && ViewData["isDashboard"] == null)
+                            {
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <div class="d-flex flex-column mb-5">
+                                            <div class="d-flex mb-1">
+                                                <div class="flex-grow-1">
+                                                    <h3 class="fw-bold">@ViewData["PageTitle"]</h3>
+                                                </div>
+                                                <div>
+                                                    @if (ViewData["PageActionText"] != null)
+                                                    {
+                                                        <a class="btn btn-success" href="@ViewData["PageActionUrl"]">
+                                                            @ViewData["PageActionText"]
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <ejs-breadcrumb id="breadcrumb"
+                                                            separatorTemplate="@Html.Raw("<span class='fa-solid fa-angle-right'></span>")"></ejs-breadcrumb>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @RenderBody()
+                        </main>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            $('#search-icon').click(function () {
+                $('#search-box').toggleClass('show');
+                if ($('#search-box').hasClass('show')) {
+                    $('#search-box').focus();
+                } else {
+                    $('#search-box').val('');
+                }
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <ejs-scripts></ejs-scripts>
+</body>
+</html>
