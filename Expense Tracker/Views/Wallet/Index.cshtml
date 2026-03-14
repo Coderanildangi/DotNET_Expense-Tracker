@@ -1,0 +1,85 @@
+@model IEnumerable<Expense_Tracker.Models.WalletAccount>
+
+@{
+    ViewData["PageTitle"] = "Accounts / Wallets";
+    ViewData["PageActionText"] = "+ New Account";
+    ViewData["PageActionUrl"] = "/Wallet/AddOrEdit";
+}
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="widget p-4">
+            <span class="text-muted">Total Balance</span>
+            <h4 class="fw-bold mb-0">@ViewBag.TotalBalance</h4>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="widget p-4">
+            <span class="text-muted">Total Credit Card Due</span>
+            <h4 class="fw-bold mb-0 text-danger">@ViewBag.TotalCreditDue</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <ejs-grid id="wallet-accounts" dataSource="@ViewBag.AccountSummary" gridLines="None"
+                  allowSorting="true" allowPaging="true">
+            <e-grid-pagesettings pageSize="8"></e-grid-pagesettings>
+            <e-grid-columns>
+                <e-grid-column headerText="Account" field="name"></e-grid-column>
+                <e-grid-column headerText="Type" field="type" width="140"></e-grid-column>
+                <e-grid-column headerText="Opening" field="openingBalance" textAlign="Right" width="140"></e-grid-column>
+                <e-grid-column headerText="Balance" field="currentBalance" textAlign="Right" width="140"></e-grid-column>
+                <e-grid-column headerText="Credit Due" field="creditDue" textAlign="Right" width="140"></e-grid-column>
+                <e-grid-column headerText="Due Date" field="dueDate" width="140"></e-grid-column>
+                <e-grid-column headerText="Actions" template="#walletActionTemplate" width="100"></e-grid-column>
+            </e-grid-columns>
+        </ejs-grid>
+    </div>
+    <div class="col-md-4">
+        <div class="widget h-100 p-4">
+            <h6 class="fw-bold mb-3">Quick Actions</h6>
+            <div class="d-grid gap-2">
+                <a href="/Wallet/AddOrEdit" class="btn btn-outline-light text-start">
+                    <i class="fa-solid fa-wallet me-2"></i>Add account
+                </a>
+                <a href="/Wallet/Transfers" class="btn btn-outline-light text-start">
+                    <i class="fa-solid fa-right-left me-2"></i>View transfers
+                </a>
+                <a href="/Wallet/AddTransfer" class="btn btn-success text-start">
+                    <i class="fa-solid fa-arrow-right-arrow-left me-2"></i>New transfer
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="walletActionTemplate" type="text/x-template">
+    <div class="d-flex flex-row justify-content-start">
+        <a class="btn btn-sm no-a-decoration" href="/Wallet/AddOrEdit/${walletAccountId}">
+            <i class="fa-solid fa-pen fa-lg"></i>
+        </a>
+        <form action="/Wallet/Delete/${walletAccountId}" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-link no-a-decoration"
+                    onclick="return confirm(&quot;Are sure to delete this record?&quot;)">
+                <i class="fa-solid fa-trash-can fa-lg text-danger"></i>
+            </button>
+        </form>
+    </div>
+</script>

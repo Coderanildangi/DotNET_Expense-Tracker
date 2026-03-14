@@ -52,8 +52,8 @@ namespace Expense_Tracker.Controllers
                 .GroupBy(j => j.CategoryId)
                 .Select(k => new
                 {
-                    categoryTitleWithIcon = (k.First().Category != null)
-                        ? k.First().Category!.Icon + " " + k.First().Category!.Title
+                    categoryTitle = (k.First().Category != null)
+                        ? k.First().Category!.Title
                         : "Unknown Category",
                     amount = k.Sum(j => j.Amount),
                     formattedAmount = k.Sum(j => j.Amount).ToString("C0"),
@@ -132,7 +132,8 @@ namespace Expense_Tracker.Controllers
 
                 return new
                 {
-                    categoryTitleWithIcon = i.Icon + " " + i.Title,
+                    categoryTitle = i.Title,
+                    categoryIconCssClass = i.IconCssClass,
                     budgetValue = budgetAmount,
                     spentValue = spentAmount,
                     budget = budgetAmount.ToString("C0"),
@@ -147,9 +148,53 @@ namespace Expense_Tracker.Controllers
             ViewBag.TotalMonthlySpent = budgetStatus.Sum(i => i.spentValue).ToString("C0");
             ViewBag.BudgetStatus = budgetStatus;
 
+            // Accounts summary and credit dues
+            List<WalletAccount> walletAccounts = await _context.WalletAccounts
+                .OrderBy(i => i.Name)
+                .ToListAsync();
+            List<AccountTransfer> accountTransfers = await _context.AccountTransfers.ToListAsync();
+            List<Transaction> allTransactionsWithAccounts = await _context.Transactions
+                .Include(i => i.Category)
+                .Where(i => i.WalletAccountId.HasValue)
+                .ToListAsync();
+
+            var accountBalanceSummary = walletAccounts.Select(account =>
+            {
+                int income = allTransactionsWithAccounts
+                    .Where(i => i.WalletAccountId == account.WalletAccountId && i.Category?.Type == "Income")
+                    .Sum(i => i.Amount);
+                int expense = allTransactionsWithAccounts
+                    .Where(i => i.WalletAccountId == account.WalletAccountId && i.Category?.Type == "Expense")
+                    .Sum(i => i.Amount);
+                int incomingTransfers = accountTransfers
+                    .Where(i => i.ToWalletAccountId == account.WalletAccountId)
+                    .Sum(i => i.Amount);
+                int outgoingTransfers = accountTransfers
+                    .Where(i => i.FromWalletAccountId == account.WalletAccountId)
+                    .Sum(i => i.Amount);
+
+                int currentBalance = account.OpeningBalance + income - expense + incomingTransfers - outgoingTransfers;
+                int creditDue = account.IsCreditCard && currentBalance < 0 ? Math.Abs(currentBalance) : 0;
+
+                return new
+                {
+                    accountName = account.Name,
+                    accountType = account.Type,
+                    balance = currentBalance.ToString("C0"),
+                    balanceValue = currentBalance,
+                    creditDue = creditDue == 0 ? "-" : creditDue.ToString("C0"),
+                    creditDueValue = creditDue
+                };
+            }).ToList();
+
+            ViewBag.AccountBalanceSummary = accountBalanceSummary;
+            ViewBag.TotalWalletBalance = accountBalanceSummary.Sum(i => i.balanceValue).ToString("C0");
+            ViewBag.TotalCreditCardDue = accountBalanceSummary.Sum(i => i.creditDueValue).ToString("C0");
+
             //Recent Transactions
             ViewBag.RecentTransactions = await _context.Transactions
                 .Include(i => i.Category)
+                .Include(i => i.WalletAccount)
                 .OrderByDescending(j => j.Date)
                 .Take(5)
                 .ToListAsync();

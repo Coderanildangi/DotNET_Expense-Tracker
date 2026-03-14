@@ -8,7 +8,8 @@
 <div class="row">
     <div class="col-md-7">
         <div class="widget p-5" style="background-color:#212b36">
-            <form asp-action="AddOrEdit">
+            <form asp-action="AddOrEdit" method="post">
+                @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" name="CategoryId" value="@Model.CategoryId" />
                 <div class="mb-3">
@@ -24,7 +25,18 @@
                     <span asp-validation-for="Title" class="text-danger fs-6"></span>
                 </div>
                 <div class="mb-3">
-                    <ejs-textbox id="icon" placeholder="Icon" ejs-for="Icon" floatLabelType="Always"></ejs-textbox>
+                    <ejs-dropdownlist id="icon" ejs-for="Icon"
+                                      dataSource="@ViewBag.IconOptions"
+                                      placeholder="Select icon"
+                                      floatLabelType="Always"
+                                      allowFiltering="true"
+                                      filterType="Contains"
+                                      popupHeight="280px"
+                                      itemTemplate="#iconItemTemplate"
+                                      valueTemplate="#iconValueTemplate">
+                        <e-dropdownlist-fields value="CssClass" text="DisplayName"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                    <span asp-validation-for="Icon" class="text-danger fs-6"></span>
                 </div>
                 <div class="mb-3">
                     <ejs-numerictextbox id="monthlyBudget" ejs-for="MonthlyBudget"
@@ -44,6 +56,20 @@
         </div>
     </div>
 </div>
+
+<script id="iconItemTemplate" type="text/x-template">
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="${CssClass}" aria-hidden="true"></i>
+        <span>${DisplayName}</span>
+    </span>
+</script>
+
+<script id="iconValueTemplate" type="text/x-template">
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="${CssClass}" aria-hidden="true"></i>
+        <span>${DisplayName}</span>
+    </span>
+</script>
 
 
 @*@section Scripts {

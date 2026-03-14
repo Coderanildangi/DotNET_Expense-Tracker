@@ -4,6 +4,7 @@ using Expense_Tracker.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Expense_Tracker.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260314103951_ExpandCategoryIconLength")]
+    partial class ExpandCategoryIconLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,50 +23,6 @@ namespace Expense_Tracker.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("Expense_Tracker.Models.AccountTransfer", b =>
-                {
-                    b.Property<int>("AccountTransferId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AccountTransferId"), 1L, 1);
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FromWalletAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<int>("ToWalletAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("AccountTransferId");
-
-                    b.HasIndex("FromWalletAccountId");
-
-                    b.HasIndex("ToWalletAccountId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AccountTransfers");
-                });
 
             modelBuilder.Entity("Expense_Tracker.Models.ApplicationUser", b =>
                 {
@@ -201,60 +159,13 @@ namespace Expense_Tracker.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("WalletAccountId")
-                        .HasColumnType("int");
-
                     b.HasKey("TransactionId");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("WalletAccountId");
-
                     b.ToTable("Transactions");
-                });
-
-            modelBuilder.Entity("Expense_Tracker.Models.WalletAccount", b =>
-                {
-                    b.Property<int>("WalletAccountId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WalletAccountId"), 1L, 1);
-
-                    b.Property<int?>("CreditLimit")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(80)");
-
-                    b.Property<int>("OpeningBalance")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("WalletAccountId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WalletAccounts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -390,25 +301,6 @@ namespace Expense_Tracker.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Expense_Tracker.Models.AccountTransfer", b =>
-                {
-                    b.HasOne("Expense_Tracker.Models.WalletAccount", "FromWalletAccount")
-                        .WithMany()
-                        .HasForeignKey("FromWalletAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Expense_Tracker.Models.WalletAccount", "ToWalletAccount")
-                        .WithMany()
-                        .HasForeignKey("ToWalletAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FromWalletAccount");
-
-                    b.Navigation("ToWalletAccount");
-                });
-
             modelBuilder.Entity("Expense_Tracker.Models.Transaction", b =>
                 {
                     b.HasOne("Expense_Tracker.Models.Category", "Category")
@@ -417,14 +309,7 @@ namespace Expense_Tracker.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Expense_Tracker.Models.WalletAccount", "WalletAccount")
-                        .WithMany()
-                        .HasForeignKey("WalletAccountId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Category");
-
-                    b.Navigation("WalletAccount");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

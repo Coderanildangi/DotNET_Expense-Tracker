@@ -1,0 +1,49 @@
+@model Expense_Tracker.Models.WalletAccount
+
+@{
+    ViewData["PageTitle"] = Model.WalletAccountId == 0 ? "Create a new account" : "Edit account";
+}
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="widget p-5" style="background-color:#212b36">
+            <form asp-action="AddOrEdit" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" name="WalletAccountId" value="@Model.WalletAccountId" />
+                <div class="mb-3">
+                    <ejs-textbox id="name" ejs-for="Name" placeholder="Account name" floatLabelType="Always"></ejs-textbox>
+                    <span asp-validation-for="Name" class="text-danger fs-6"></span>
+                </div>
+                <div class="mb-3">
+                    <ejs-dropdownlist id="type" ejs-for="Type" dataSource="@ViewBag.AccountTypes"
+                                      placeholder="Account type" floatLabelType="Always"></ejs-dropdownlist>
+                    <span asp-validation-for="Type" class="text-danger fs-6"></span>
+                </div>
+                <div class="mb-3">
+                    <ejs-numerictextbox id="openingBalance" ejs-for="OpeningBalance"
+                                        placeholder="Opening balance" floatLabelType="Always"
+                                        min=0 format="c0"></ejs-numerictextbox>
+                    <span asp-validation-for="OpeningBalance" class="text-danger fs-6"></span>
+                </div>
+                <div class="mb-3">
+                    <ejs-numerictextbox id="creditLimit" ejs-for="CreditLimit"
+                                        placeholder="Credit limit (Credit Card only)" floatLabelType="Always"
+                                        min=0 format="c0"></ejs-numerictextbox>
+                    <span asp-validation-for="CreditLimit" class="text-danger fs-6"></span>
+                </div>
+                <div class="mb-3">
+                    <ejs-datepicker id="dueDate" ejs-for="DueDate"
+                                    placeholder="Payment due date (Credit Card only)" floatLabelType="Always"
+                                    format="MMM-dd-yy"></ejs-datepicker>
+                </div>
+                <ejs-button id="submit" type="submit" content="Submit" cssClass="e-success"></ejs-button>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="widget h-100 d-flex justify-content-center align-items-center">
+            <i class="fa-solid fa-wallet fa-2xl"></i>
+        </div>
+    </div>
+</div>

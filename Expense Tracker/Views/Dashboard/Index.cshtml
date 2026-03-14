@@ -55,7 +55,7 @@
             <ejs-accumulationchart id="doughnutchart" enableSmartLabels background="#1a222b">
                 <e-accumulation-series-collection>
                     <e-accumulation-series dataSource="@ViewBag.DoughnutChartData"
-                                           xName="categoryTitleWithIcon" yName="amount"
+                                           xName="categoryTitle" yName="amount"
                                            innerRadius="60%" legendShape="Circle" 
                                            palettes=@(new string[]{"#0e8d76","#a4b219","#cb9b00","#8a442c","#0454b5","#7d0a0a","#822690","#4c2090","#313e93","#0096ac"})>
                         <e-accumulationseries-datalabel name="formattedAmount" visible></e-accumulationseries-datalabel>
@@ -122,7 +122,7 @@
                 <ejs-grid id="budget-tracker" dataSource="@ViewBag.BudgetStatus" gridLines="None"
                           allowSorting="true">
                     <e-grid-columns>
-                        <e-grid-column headerText="Category" field="categoryTitleWithIcon"></e-grid-column>
+                        <e-grid-column headerText="Category" template="#budgetCategoryTemplate"></e-grid-column>
                         <e-grid-column headerText="Budget" field="budget" textAlign="Right" width="140"></e-grid-column>
                         <e-grid-column headerText="Spent" field="spent" textAlign="Right" width="140"></e-grid-column>
                         <e-grid-column headerText="Remaining" field="remaining" textAlign="Right" width="150"></e-grid-column>
@@ -146,7 +146,8 @@
                 <ejs-grid id="recent-transactions"
                 dataSource="@ViewBag.RecentTransactions" gridLines="None">
                     <e-grid-columns>
-                        <e-grid-column headerText="Category" field="CategoryTitleWithIcon"></e-grid-column>
+                        <e-grid-column headerText="Category" template="#recentTransactionCategoryTemplate"></e-grid-column>
+                        <e-grid-column headerText="Account" field="AccountName"></e-grid-column>
                         <e-grid-column headerText="Date" field="Date" type="date" format="MMM-dd-yy"></e-grid-column>
                         <e-grid-column headerText="Amount" field="FormattedAmount" textAlign="Right"></e-grid-column>
                     </e-grid-columns>
@@ -155,13 +156,46 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="widget h-100">
-            <div class="d-flex justify-content-center align-items-center h-100">
-                <span><i class="fa-solid fa-plus fa-2xl"></i> Widget</span>
+        <div class="widget h-100 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Accounts / Wallets</h5>
+                <a href="/Wallet" class="btn btn-sm btn-outline-light">Manage</a>
             </div>
+            <div class="mb-3 d-flex justify-content-between">
+                <div>
+                    <div class="small text-muted">Total Balance</div>
+                    <div class="fw-bold">@ViewBag.TotalWalletBalance</div>
+                </div>
+                <div class="text-end">
+                    <div class="small text-muted">Credit Card Due</div>
+                    <div class="fw-bold text-danger">@ViewBag.TotalCreditCardDue</div>
+                </div>
+            </div>
+            <ejs-grid id="account-balance-summary" dataSource="@ViewBag.AccountBalanceSummary" gridLines="None" allowSorting="true">
+                <e-grid-columns>
+                    <e-grid-column headerText="Account" field="accountName"></e-grid-column>
+                    <e-grid-column headerText="Type" field="accountType"></e-grid-column>
+                    <e-grid-column headerText="Balance" field="balance" textAlign="Right"></e-grid-column>
+                    <e-grid-column headerText="Due" field="creditDue" textAlign="Right"></e-grid-column>
+                </e-grid-columns>
+            </ejs-grid>
         </div>
     </div>
 </div>
+
+<script id="budgetCategoryTemplate" type="text/x-template">
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="${categoryIconCssClass}" aria-hidden="true"></i>
+        <span>${categoryTitle}</span>
+    </span>
+</script>
+
+<script id="recentTransactionCategoryTemplate" type="text/x-template">
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="${Category.IconCssClass}" aria-hidden="true"></i>
+        <span>${Category.Title}</span>
+    </span>
+</script>
 
 <script id="budgetStatusTemplate" type="text/x-template">
     ${if(isOverBudget)}

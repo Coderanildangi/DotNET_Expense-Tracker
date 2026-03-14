@@ -15,6 +15,10 @@ namespace Expense_Tracker.Models
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Please select an account.")]
+        public int? WalletAccountId { get; set; }
+        public WalletAccount? WalletAccount { get; set; }
+
         [Range(1, int.MaxValue, ErrorMessage = "Amount should be greater than 0.")]
         public int Amount { get; set; }
 
@@ -42,6 +46,15 @@ namespace Expense_Tracker.Models
             get
             {
                 return ((Category == null || Category.Type == "Expense") ? "- " : "+ ") + Amount.ToString("C0");
+            }
+        }
+
+        [NotMapped]
+        public string AccountName
+        {
+            get
+            {
+                return WalletAccount?.Name ?? "No Account";
             }
         }
 

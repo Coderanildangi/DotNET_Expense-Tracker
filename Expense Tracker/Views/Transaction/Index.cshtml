@@ -1,18 +1,87 @@
-﻿@model IEnumerable<Expense_Tracker.Models.Transaction>
+@model IEnumerable<Expense_Tracker.Models.Transaction>
 
 @{
     ViewData["PageTitle"] = "Transactions";
     ViewData["PageActionText"] = "+ New Transaction";
     ViewData["PageActionUrl"] = "/Transaction/AddOrEdit";
+
+    var filterCategories = ViewBag.FilterCategories as IEnumerable<Expense_Tracker.Models.Category> ?? System.Linq.Enumerable.Empty<Expense_Tracker.Models.Category>();
+    var filterAccounts = ViewBag.FilterAccounts as IEnumerable<Expense_Tracker.Models.WalletAccount> ?? System.Linq.Enumerable.Empty<Expense_Tracker.Models.WalletAccount>();
+    int? selectedCategoryId = ViewBag.CategoryId as int?;
+    int? selectedAccountId = ViewBag.AccountId as int?;
 }
 
 <div class="row">
     <div class="col-md-7">
+        <div class="widget p-3 mb-3">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label mb-1">Date From</label>
+                    <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label mb-1">Date To</label>
+                    <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label mb-1">Category</label>
+                    <select name="categoryId" class="form-select">
+                        <option value="">All Categories</option>
+                        @foreach (var category in filterCategories)
+                        {
+                            if (selectedCategoryId.HasValue && selectedCategoryId.Value == category.CategoryId)
+                            {
+                                <option value="@category.CategoryId" selected>@category.Title</option>
+                            }
+                            else
+                            {
+                                <option value="@category.CategoryId">@category.Title</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label mb-1">Account</label>
+                    <select name="accountId" class="form-select">
+                        <option value="">All Accounts</option>
+                        @foreach (var account in filterAccounts)
+                        {
+                            if (selectedAccountId.HasValue && selectedAccountId.Value == account.WalletAccountId)
+                            {
+                                <option value="@account.WalletAccountId" selected>@account.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@account.WalletAccountId">@account.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label mb-1">Min Amount</label>
+                    <input type="number" min="0" name="minAmount" value="@ViewBag.MinAmount" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label mb-1">Max Amount</label>
+                    <input type="number" min="0" name="maxAmount" value="@ViewBag.MaxAmount" class="form-control" />
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label mb-1">Transaction</label>
+                    <input type="text" name="transaction" value="@ViewBag.Transaction" class="form-control" placeholder="Search by note, category, account, or id" />
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-success w-100">Apply</button>
+                    <a asp-action="Index" class="btn btn-outline-light w-100">Clear</a>
+                </div>
+            </form>
+        </div>
+
         <ejs-grid id="transactions" dataSource="@Model" gridLines="None"
                   allowSorting="true" allowPaging="true">
             <e-grid-pagesettings pageSize="10"></e-grid-pagesettings>
             <e-grid-columns>
-                <e-grid-column headerText="Category" field="CategoryTitleWithIcon"></e-grid-column>
+                <e-grid-column headerText="Category" template="#categoryColumnTemplate"></e-grid-column>
+                <e-grid-column headerText="Account" field="AccountName" width="130"></e-grid-column>
                 <e-grid-column headerText="Date" field="Date" width="110px"
                     type="date" format="MMM-dd-yy" textAlign="Left"></e-grid-column>
                 <e-grid-column headerText="Amount" field="FormattedAmount" textAlign="Right" width="110px"></e-grid-column>
@@ -26,6 +95,13 @@
         </div>
     </div>
 </div>
+
+<script id="categoryColumnTemplate" type="text/x-template">
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="${Category.IconCssClass}" aria-hidden="true"></i>
+        <span>${Category.Title}</span>
+    </span>
+</script>
 
 <script id="actionColumnTemplate" type="text/x-template">
     <div class="d-flex flex-row justify-content-start">

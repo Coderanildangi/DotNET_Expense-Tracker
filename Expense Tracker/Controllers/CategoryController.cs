@@ -36,7 +36,14 @@ namespace Expense_Tracker.Controllers
         public IActionResult AddOrEdit(int id = 0)
         {
             if (id == 0)
-                return View(new Category());
+            {
+                var category = new Category
+                {
+                    Icon = CategoryIconCatalog.Options.First().CssClass
+                };
+                PopulateIconOptions();
+                return View(category);
+            }
             else
             {
                 var category = _context.Categories.FirstOrDefault(i => i.CategoryId == id);
@@ -45,6 +52,12 @@ namespace Expense_Tracker.Controllers
                     return NotFound();
                 }
 
+                if (!CategoryIconCatalog.IsValidIcon(category.Icon))
+                {
+                    category.Icon = CategoryIconCatalog.Options.First().CssClass;
+                }
+
+                PopulateIconOptions();
                 return View(category);
             }
 
@@ -65,6 +78,11 @@ namespace Expense_Tracker.Controllers
             if (category.Type == "Income")
             {
                 category.MonthlyBudget = null;
+            }
+
+            if (!CategoryIconCatalog.IsValidIcon(category.Icon))
+            {
+                category.Icon = CategoryIconCatalog.Options.First().CssClass;
             }
 
             if (ModelState.IsValid)
@@ -90,7 +108,14 @@ namespace Expense_Tracker.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            PopulateIconOptions();
             return View(category);
+        }
+
+        [NonAction]
+        public void PopulateIconOptions()
+        {
+            ViewBag.IconOptions = CategoryIconCatalog.Options;
         }
 
 

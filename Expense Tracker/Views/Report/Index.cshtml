@@ -1,7 +1,84 @@
-﻿
+
+@model Expense_Tracker.Models.ReportViewModel
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["PageTitle"] = "Reports & Analytics";
+    string selectedReportType = string.IsNullOrWhiteSpace(Model.SelectedReportType) ? "daily-expenses" : Model.SelectedReportType;
 }
 
-<h1>View</h1>
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="widget h-100 p-4">
+            <h5 class="fw-bold mb-3">Reports</h5>
+            <div class="list-group list-group-flush">
+                @foreach (var report in Model.Reports)
+                {
+                    string itemClasses = report.Key.Equals(selectedReportType, StringComparison.OrdinalIgnoreCase)
+                        ? "list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-transparent px-0 active"
+                        : "list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-transparent px-0";
+
+                    <a asp-action="Index" asp-route-reportType="@report.Key" class="@itemClasses">
+                        <span>@report.Label</span>
+                        <i class="fa-solid fa-angle-right text-muted"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="widget h-100 p-4">
+            <h5 class="fw-bold mb-3">Export</h5>
+            <div class="d-grid gap-2">
+                <a asp-action="Export" asp-route-reportType="@selectedReportType" asp-route-format="pdf" class="btn btn-outline-secondary text-start">
+                    <i class="fa-solid fa-file-pdf me-2"></i>PDF
+                </a>
+                <a asp-action="Export" asp-route-reportType="@selectedReportType" asp-route-format="excel" class="btn btn-outline-secondary text-start">
+                    <i class="fa-solid fa-file-excel me-2"></i>Excel
+                </a>
+                <a asp-action="Export" asp-route-reportType="@selectedReportType" asp-route-format="csv" class="btn btn-outline-secondary text-start">
+                    <i class="fa-solid fa-file-csv me-2"></i>CSV
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="widget p-4">
+            <h5 class="fw-bold mb-3">@Model.SelectedReportTitle</h5>
+
+            @if (Model.Rows.Count == 0)
+            {
+                <div class="text-muted">No data available for this report.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped align-middle mb-0">
+                        <thead>
+                            <tr>
+                                @foreach (var header in Model.Headers)
+                                {
+                                    <th scope="col">@header</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in Model.Rows)
+                            {
+                                <tr>
+                                    @foreach (var cell in row)
+                                    {
+                                        <td>@cell</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 

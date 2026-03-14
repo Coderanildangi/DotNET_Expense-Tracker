@@ -26,7 +26,7 @@
                   allowSorting="true" allowPaging="true">
             <e-grid-pagesettings pageSize="5"></e-grid-pagesettings>
             <e-grid-columns>
-                <e-grid-column headerText="Category" field="TitleWithIcon"></e-grid-column>
+                <e-grid-column headerText="Category" template="#categoryColumnTemplate"></e-grid-column>
                 <e-grid-column headerText="Type" template="#typeColumnTemplate" width="150px"></e-grid-column>
                 <e-grid-column headerText="Monthly Budget" field="MonthlyBudgetFormatted" width="180px" textAlign="Right"></e-grid-column>
                 <e-grid-column headerText="Actions" template="#actionColumnTemplate" width="100px"></e-grid-column>
@@ -39,6 +39,13 @@
         </div>
     </div>
 </div>
+
+<script id="categoryColumnTemplate" type="text/x-template">
+    <span class="d-inline-flex align-items-center gap-2">
+        <i class="${IconCssClass}" aria-hidden="true"></i>
+        <span>${Title}</span>
+    </span>
+</script>
 
 <script id="typeColumnTemplate" type="text/x-template">
     ${if(Type=="Income")}

@@ -115,6 +115,7 @@ namespace Expense_Tracker.Controllers
             }
 
             await SeedDefaultCategoriesForUser(user.Id);
+            await SeedDefaultAccountsForUser(user.Id);
 
             await _signInManager.SignInAsync(user, isPersistent: false);
             return RedirectToAction("Index", "Dashboard");
@@ -133,17 +134,33 @@ namespace Expense_Tracker.Controllers
         {
             var defaultCategories = new List<Category>
             {
-                new() { UserId = userId, Title = "Salary", Icon = "S", Type = "Income" },
-                new() { UserId = userId, Title = "Reimbursements", Icon = "R", Type = "Income" },
-                new() { UserId = userId, Title = "Stocks", Icon = "ST", Type = "Income" },
-                new() { UserId = userId, Title = "Rent", Icon = "RE", Type = "Expense", MonthlyBudget = 25000 },
-                new() { UserId = userId, Title = "Travel", Icon = "TR", Type = "Expense", MonthlyBudget = 6000 },
-                new() { UserId = userId, Title = "Food", Icon = "FO", Type = "Expense", MonthlyBudget = 8000 },
-                new() { UserId = userId, Title = "Shopping", Icon = "SH", Type = "Expense", MonthlyBudget = 5000 },
-                new() { UserId = userId, Title = "Utilities", Icon = "UT", Type = "Expense", MonthlyBudget = 4000 }
+                new() { UserId = userId, Title = "Salary", Icon = "fa-solid fa-wallet", Type = "Income" },
+                new() { UserId = userId, Title = "Reimbursements", Icon = "fa-solid fa-hand-holding-dollar", Type = "Income" },
+                new() { UserId = userId, Title = "Stocks", Icon = "fa-solid fa-chart-line", Type = "Income" },
+                new() { UserId = userId, Title = "Rent", Icon = "fa-solid fa-house", Type = "Expense", MonthlyBudget = 25000 },
+                new() { UserId = userId, Title = "Travel", Icon = "fa-solid fa-plane", Type = "Expense", MonthlyBudget = 6000 },
+                new() { UserId = userId, Title = "Food", Icon = "fa-solid fa-utensils", Type = "Expense", MonthlyBudget = 8000 },
+                new() { UserId = userId, Title = "Shopping", Icon = "fa-solid fa-basket-shopping", Type = "Expense", MonthlyBudget = 5000 },
+                new() { UserId = userId, Title = "Utilities", Icon = "fa-solid fa-bolt", Type = "Expense", MonthlyBudget = 4000 }
             };
 
             _context.Categories.AddRange(defaultCategories);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedDefaultAccountsForUser(string userId)
+        {
+            var defaultAccounts = new List<WalletAccount>
+            {
+                new() { UserId = userId, Name = "Cash", Type = "Cash", OpeningBalance = 0 },
+                new() { UserId = userId, Name = "Bank Account", Type = "Bank Account", OpeningBalance = 0 },
+                new() { UserId = userId, Name = "Credit Card", Type = "Credit Card", OpeningBalance = 0, CreditLimit = 50000, DueDate = DateTime.Today.AddDays(15) },
+                new() { UserId = userId, Name = "PayTM", Type = "PayTM", OpeningBalance = 0 },
+                new() { UserId = userId, Name = "PhonePe", Type = "PhonePe", OpeningBalance = 0 },
+                new() { UserId = userId, Name = "PayPal", Type = "PayPal", OpeningBalance = 0 }
+            };
+
+            _context.WalletAccounts.AddRange(defaultAccounts);
             await _context.SaveChangesAsync();
         }
     }
