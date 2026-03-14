@@ -1,0 +1,73 @@
+# -----------------------------
+# Build output
+# -----------------------------
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+publish/
+artifacts/
+
+# -----------------------------
+# User-specific files
+# -----------------------------
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# -----------------------------
+# Visual Studio / VS Code / Rider
+# -----------------------------
+.vs/
+.vscode/
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+# -----------------------------
+# ASP.NET Core / tooling
+# -----------------------------
+wwwroot/lib/
+ScaffoldingReadMe.txt
+
+# -----------------------------
+# NuGet
+# -----------------------------
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+!**/[Pp]ackages/repositories.config
+*.nuget.props
+*.nuget.targets
+
+# -----------------------------
+# Test results
+# -----------------------------
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+
+# -----------------------------
+# Database / local secrets
+# -----------------------------
+*.mdf
+*.ldf
+appsettings.Development.json
+secrets.json
+
+# -----------------------------
+# Environment files
+# -----------------------------
+.env
+.env.*
+!.env.example
+
+# -----------------------------
+# OS files
+# -----------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
